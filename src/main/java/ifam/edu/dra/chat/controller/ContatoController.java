@@ -1,8 +1,10 @@
 package ifam.edu.dra.chat.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,37 +15,54 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ifam.edu.dra.chat.model.Contato;
+import ifam.edu.dra.chat.service.ContatoService;
 
 @RestController
 @RequestMapping("/contato")
 public class ContatoController {
 
-	private List<Contato> contatos = new ArrayList<>();
+	@Autowired
+	ContatoService contatoService;
 
 	@GetMapping
-	public List<Contato> getContatos() {
-		return contatos;
+	ResponseEntity<List<Contato>> getContatos() {
+		List<Contato> contatos = contatoService.getContatos();
+		if (contatos.isEmpty())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(contatos);
+		return ResponseEntity.ok(contatos);
 	}
 
 	@GetMapping("/{id}")
-	public Contato getContato(@PathVariable int id) {
-		return contatos.get(id);
+	ResponseEntity<Contato> getContato(@PathVariable int id) {
+		try {
+			return ResponseEntity.ok(contatoService.getContato(id));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Contato());
+		}
 	}
 
 	@PostMapping
-	public Contato setContato(@RequestBody Contato contato) {
-		contatos.add(contato);
-		return contato;
+	ResponseEntity<Contato> setContato(@RequestBody Contato contato) {
+		contatoService.setContato(contato);
+		return ResponseEntity.created(null).body(contato);
 	}
 
 	@PutMapping("/{id}")
-	public Contato updateContato(@RequestBody Contato contato, @PathVariable int id) {
-		contatos.set(id, contato);
-		return contato;
+	ResponseEntity<Contato> updateContato(@RequestBody Contato contato, @PathVariable int id) {
+		try {
+			return ResponseEntity.accepted().body(contatoService.updateContato(id, contato));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Contato());
+		}
 	}
 
 	@DeleteMapping("/{id}")
-	public void deleteContato(@PathVariable int id) {
-		contatos.remove(id);
+	ResponseEntity<Contato> deleteContato(@PathVariable int id) {
+		try {
+			contatoService.deleteContato(id);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Contato());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Contato());
+		}
 	}
 }
