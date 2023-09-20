@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ifam.edu.dra.chat.dto.MensagemDTO;
 import ifam.edu.dra.chat.model.Contato;
 import ifam.edu.dra.chat.model.Mensagem;
 import ifam.edu.dra.chat.repository.MensagemRepository;
@@ -27,8 +28,16 @@ public class MensagemService {
 		return new Mensagem();
 	}
 
-	public Mensagem setMensagem(Mensagem mensagem) {
-		return mensagemRepository.save(mensagem);
+	public List<Mensagem> getMensagensByReceptor(Long receptorId) {
+		Contato receptor = new Contato();
+		receptor.setId(receptorId);
+		return mensagemRepository.findAllByReceptor(receptor);
+	}
+
+	public MensagemDTO setMensagem(MensagemDTO mensagemDTO) {
+		Mensagem mensagem = mensagemDTO.toMensagem();
+		Mensagem mensagemSalva = mensagemRepository.save(mensagem);
+		return MensagemDTO.fromMensagem(mensagemSalva);
 	}
 
 }

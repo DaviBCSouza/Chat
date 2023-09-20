@@ -13,17 +13,17 @@ public class Contato {
 	private Long id;
 
 	private String nome;
-	
+
 	private String email;
-	
+
 	private String telefone;
-	
+
 	private String endereco;
-	
+
 	private String bairro;
-	
+
 	private String cidade;
-	
+
 	private String estado;
 
 	public Contato() {
