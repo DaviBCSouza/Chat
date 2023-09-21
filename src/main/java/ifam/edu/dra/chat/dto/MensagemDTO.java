@@ -13,11 +13,12 @@ public class MensagemDTO {
 	private Long receptorId;
 
 	public MensagemDTO() {
+		this.dataHora = Calendar.getInstance();
 	}
 
-	public MensagemDTO(Long id, Calendar dataHora, String conteudo, Long emissorId, Long receptorId) {
+	public MensagemDTO(Long id, String conteudo, Long emissorId, Long receptorId) {
+		this();
 		this.id = id;
-		this.dataHora = dataHora;
 		this.conteudo = conteudo;
 		this.emissorId = emissorId;
 		this.receptorId = receptorId;

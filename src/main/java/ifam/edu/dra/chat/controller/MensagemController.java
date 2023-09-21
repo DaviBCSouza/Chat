@@ -1,5 +1,6 @@
 package ifam.edu.dra.chat.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,28 +25,45 @@ public class MensagemController {
 	MensagemService mensagemService;
 
 	@GetMapping
-	ResponseEntity<List<Mensagem>> getMensagens() {
-		List<Mensagem> mensagem = mensagemService.getMensagens();
-		if (mensagem.isEmpty())
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensagem);
-		return ResponseEntity.ok(mensagem);
+	ResponseEntity<List<MensagemDTO>> getMensagens() {
+		List<Mensagem> mensagens = mensagemService.getMensagens();
+		List<MensagemDTO> mensagemDTOs = new ArrayList<>();
+
+		for (Mensagem mensagem : mensagens) {
+			mensagemDTOs.add(new MensagemDTO(mensagem.getId(), mensagem.getConteudo(), mensagem.getEmissor().getId(),
+					mensagem.getReceptor().getId()));
+		}
+
+		if (mensagemDTOs.isEmpty())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensagemDTOs);
+		return ResponseEntity.ok(mensagemDTOs);
 	}
 
 	@GetMapping("/{id}")
-	ResponseEntity<Mensagem> getMensagem(@PathVariable Long id) {
+	ResponseEntity<MensagemDTO> getMensagem(@PathVariable Long id) {
 		try {
-			return ResponseEntity.ok(mensagemService.getMensagem(id));
+			Mensagem mensagem = mensagemService.getMensagem(id);
+			MensagemDTO mensagemDTO = new MensagemDTO(mensagem.getId(), mensagem.getConteudo(),
+					mensagem.getEmissor().getId(), mensagem.getReceptor().getId());
+			return ResponseEntity.ok(mensagemDTO);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Mensagem());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MensagemDTO());
 		}
 	}
 
 	@GetMapping("/receptor/{receptorId}")
-	ResponseEntity<List<Mensagem>> getMensagensByReceptor(@PathVariable Long receptorId) {
+	ResponseEntity<List<MensagemDTO>> getMensagensByReceptor(@PathVariable Long receptorId) {
 		List<Mensagem> mensagens = mensagemService.getMensagensByReceptor(receptorId);
-		if (mensagens.isEmpty())
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensagens);
-		return ResponseEntity.ok(mensagens);
+		List<MensagemDTO> mensagemDTOs = new ArrayList<>();
+
+		for (Mensagem mensagem : mensagens) {
+			mensagemDTOs.add(new MensagemDTO(mensagem.getId(), mensagem.getConteudo(), mensagem.getEmissor().getId(),
+					mensagem.getReceptor().getId()));
+		}
+
+		if (mensagemDTOs.isEmpty())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mensagemDTOs);
+		return ResponseEntity.ok(mensagemDTOs);
 	}
 
 	@PostMapping
